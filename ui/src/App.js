@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import ProductForm from './components/product-form/product-form'
-import ProductList from './components/product-table/product-table'
+import ProductForm from './components/product-form/product-form.js'
+import ProductList from './components/product-table/product-table.js'
 import './index.css'
 
 const App = () => {

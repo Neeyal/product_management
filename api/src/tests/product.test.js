@@ -1,25 +1,25 @@
-const request = require('supertest')
-const fs = require('fs')
-const app = require('../../app')
-const sequelize = require('../../database') // Import your Sequelize instance
-const Product = require('../../src/models/product') // Adjust path to your Product model
-const path = require('path')
+import request from 'supertest'
+import fs from 'fs'
+import path from 'path'
+import app from '../../app'
+import sequelize from '../../database'
+import Product from '../../src/models/product'
+import { describe, it, beforeAll, afterAll, expect } from 'vitest'
 
 describe('Product API Tests', () => {
   beforeAll(async () => {
-    await sequelize.sync({ force: true }) // Ensure a clean database before tests
+    await sequelize.sync({ force: true }) 
   })
 
   afterAll(async () => {
-    await sequelize.close() // Close the database connection
+    await sequelize.close() 
   })
 
   it('should fetch all products', async () => {
-    // Seed the database with a test product
     await Product.create({
       name: 'Sample Product',
       price: 19.99,
-      imagePath: 'uploads/sample-product.jpg', // Simulate an uploaded image
+      imagePath: 'uploads/sample-product.jpg',
     })
 
     const res = await request(app).get('/api/products')
@@ -42,21 +42,22 @@ describe('Product API Tests', () => {
       .post('/api/products')
       .field('name', 'Test Product')
       .field('price', '10.99')
-      .attach('image', imagePath) // Use a valid test image path
+      .attach('image', imagePath)
 
     expect(res.status).toBe(201)
     expect(res.body).toHaveProperty('id')
     expect(res.body).toHaveProperty('name', 'Test Product')
     expect(res.body).toHaveProperty('price', '10.99')
-    expect(res.body).toHaveProperty('imagePath') // Ensure image path exists
+    expect(res.body).toHaveProperty('imagePath')
     expect(res.body.imagePath).toMatch(/^uploads\//)
   })
+
   it('should return validation errors for invalid data', async () => {
     const res = await request(app)
       .post('/api/products')
       .send({ name: '', price: '', image: null })
 
     expect(res.status).toBe(400)
-    expect(res).toHaveProperty('text', '{\"message\":\"Invalid input\"}')
-    })
+    expect(res.body).toHaveProperty('message', 'Invalid input') 
+  })
 })

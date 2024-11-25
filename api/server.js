@@ -1,5 +1,5 @@
-const app = require('./app')
-const sequelize = require('./database')
+import app from './app.js'
+import sequelize from './database.js'
 
 const PORT = process.env.PORT || 3001
 

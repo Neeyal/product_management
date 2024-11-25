@@ -1,17 +1,16 @@
-const express = require('express')
-const productRoutes = require('./src/routes/product-routes')
-const sequelize = require('./database')
-const cors = require('cors')
-const path = require('path')
+import express from 'express'
+import productRoutes from './src/routes/product-routes.js'
+import sequelize from './database.js'
+import cors from 'cors'
+import path from 'path'
 
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cors('*'))
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api', productRoutes)
 
-// Export the app instance for testing
-module.exports = app
+export default app

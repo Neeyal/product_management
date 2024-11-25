@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize')
-const sequelize = require('../../database')
+import { DataTypes } from 'sequelize'
+import sequelize from '../../database.js'
 
 const Product = sequelize.define('Product', {
   name: {
@@ -18,10 +18,9 @@ const Product = sequelize.define('Product', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
-}
-, {
-    timestamps: false, // Disable Sequelize's default timestamps
-    tableName: 'products', // Ensure this matches your DB table name
+}, {
+  timestamps: false,
+  tableName: 'products',
 })
 
-module.exports = Product
+export default Product

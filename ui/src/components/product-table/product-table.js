@@ -7,9 +7,8 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
   const [nameFilter, setNameFilter] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const itemsPerPage = 5 // Number of items to display per page
+  const itemsPerPage = 5
 
-  // Filter products based on name and date range
   const filteredProducts = products.filter((product) => {
     const matchesName = product.name.toLowerCase().includes(nameFilter.toLowerCase())
     const matchesDate =
@@ -18,7 +17,6 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
     return matchesName && matchesDate
   })
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * itemsPerPage,
@@ -28,7 +26,7 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
   // Handle editing a product
   const handleEditClick = (product) => {
     setEditingProduct(product)
-    setEditedDetails({ ...product }) // Initialize the form with product details
+    setEditedDetails({ ...product })
   }
 
   // Save edited product
@@ -40,9 +38,8 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
         body: JSON.stringify(editedDetails),
       })
       if (response.ok) {
-        // Refresh the product list after saving
         await onProductUpdated()
-        setEditingProduct(null) // Exit editing mode
+        setEditingProduct(null)
       } else {
         console.error('Failed to update product')
       }
@@ -51,21 +48,17 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
     }
   }
 
-  // Cancel editing
   const handleCancelClick = () => {
     setEditingProduct(null)
-    // Optionally, refresh the product list to ensure it shows the original values
     onProductUpdated()
   }
 
-  // Change the current page
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage)
     }
   }
 
-  // Reset filters and pagination
   const resetFilters = () => {
     setNameFilter('')
     setStartDate('')

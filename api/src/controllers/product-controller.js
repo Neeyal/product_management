@@ -1,8 +1,7 @@
-const Product = require('../models/product')
-const { Op } = require('sequelize')
+import Product from '../models/product.js'
+import { Op } from 'sequelize'
 
-// Create Product
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const { name, price } = req.body
     console.log(req.file)
@@ -19,8 +18,7 @@ exports.createProduct = async (req, res) => {
   }
 }
 
-// Fetch Products
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const { search, startDate, endDate, sort, page = 1, limit = 10 } = req.query
 
@@ -44,8 +42,7 @@ exports.getProducts = async (req, res) => {
   }
 }
 
-// Update Product
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params
     const { name, price } = req.body

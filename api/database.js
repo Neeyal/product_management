@@ -1,13 +1,21 @@
-const { Sequelize } = require('sequelize')
+import dotenv from 'dotenv'
+import { Sequelize } from 'sequelize'
 
-const sequelize = new Sequelize('product_management', 'root', 'Neil@3210987', {
-  host: 'localhost',
-  dialect: 'mysql',
-})
+dotenv.config()
+
+const sequelize = new Sequelize(
+  process.env.DB_MYSQL_NAME,
+  process.env.DB_ROOTUSER,
+  process.env.DB_PASSW0RD,
+  {
+    host: process.env.DB_HOSTED,
+    dialect: 'mysql',
+  }
+)
 
 sequelize
   .authenticate()
   .then(() => console.log('Database connected'))
   .catch(err => console.log('Error: ' + err))
 
-module.exports = sequelize
+export default sequelize
