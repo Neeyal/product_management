@@ -20,7 +20,7 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const { search, startDate, endDate, sort, page = 1, limit = 10 } = req.query
+    const { search, startDate, endDate, sort } = req.query
 
     const where = {}
 
@@ -30,9 +30,7 @@ export const getProducts = async (req, res) => {
 
     const products = await Product.findAll({
       where,
-      order: [['createdAt', sort || 'DESC']],
-      limit,
-      offset: (page - 1) * limit,
+      order: [['createdAt', sort || 'DESC']]
     })
 
     const count = await Product.count({ where })
