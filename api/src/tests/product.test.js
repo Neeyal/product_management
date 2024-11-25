@@ -1,55 +1,62 @@
-const { Product } = require('../models/product') // Assuming you have a 'Product' model
-const { addProduct, getProducts, updateProduct, deleteProduct } = require('../controllers/product-controller') // Replace with actual path
+const request = require('supertest')
+const fs = require('fs')
+const app = require('../../app')
+const sequelize = require('../../database') // Import your Sequelize instance
+const Product = require('../../src/models/product') // Adjust path to your Product model
+const path = require('path')
 
-jest.mock('../models') // Mock the Product model
-
-describe('Product API with Sequelize', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
+describe('Product API Tests', () => {
+  beforeAll(async () => {
+    await sequelize.sync({ force: true }) // Ensure a clean database before tests
   })
 
-  it('should create a new product', async () => {
-    const mockProduct = { name: 'Test Product', price: 100, imagePath: '/uploads/test.jpg' }
-    Product.create.mockResolvedValueOnce({ id: 1, ...mockProduct }) // Mocking Sequelize's create method
-
-    const result = await addProduct(mockProduct)
-    expect(Product.create).toHaveBeenCalledWith(mockProduct)
-    expect(result).toEqual({ id: 1, ...mockProduct })
+  afterAll(async () => {
+    await sequelize.close() // Close the database connection
   })
 
-  it('should fetch a list of products', async () => {
-    const mockProducts = [
-      { id: 1, name: 'Product 1', price: 100, imagePath: '/uploads/product1.jpg', createdAt: '2024-11-23' },
-      { id: 2, name: 'Product 2', price: 200, imagePath: '/uploads/product2.jpg', createdAt: '2024-11-22' },
-    ]
-    Product.findAll.mockResolvedValueOnce(mockProducts) // Mocking Sequelize's findAll method
-
-    const result = await getProducts()
-    expect(Product.findAll).toHaveBeenCalledWith({
-      order: [['createdAt', 'DESC']], // Ordering by creation date
+  it('should fetch all products', async () => {
+    // Seed the database with a test product
+    await Product.create({
+      name: 'Sample Product',
+      price: 19.99,
+      imagePath: 'uploads/sample-product.jpg', // Simulate an uploaded image
     })
-    expect(result).toEqual(mockProducts)
+
+    const res = await request(app).get('/api/products')
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveProperty('products')
+    expect(Array.isArray(res.body.products)).toBe(true)
+    expect(res.body.products.length).toBeGreaterThan(0)
+    expect(res.body.products[0]).toHaveProperty('name', 'Sample Product')
   })
 
-  it('should update a product', async () => {
-    const updatedProduct = { id: 1, name: 'Updated Product', price: 150 }
-    Product.update.mockResolvedValueOnce([1]) // Mocking Sequelize's update method, which returns an array with affected rows
+  it('should create a product', async () => {
+    const imagePath = path.join(__dirname, './fixtures/test-image.jpg')
 
-    const result = await updateProduct(updatedProduct.id, updatedProduct)
-    expect(Product.update).toHaveBeenCalledWith(updatedProduct, {
-      where: { id: updatedProduct.id },
+    // Ensure the file exists
+    if (!fs.existsSync(imagePath)) {
+      throw new Error('Test image file not found at path: ' + imagePath)
+    }
+
+    const res = await request(app)
+      .post('/api/products')
+      .field('name', 'Test Product')
+      .field('price', '10.99')
+      .attach('image', imagePath) // Use a valid test image path
+
+    expect(res.status).toBe(201)
+    expect(res.body).toHaveProperty('id')
+    expect(res.body).toHaveProperty('name', 'Test Product')
+    expect(res.body).toHaveProperty('price', '10.99')
+    expect(res.body).toHaveProperty('imagePath') // Ensure image path exists
+    expect(res.body.imagePath).toMatch(/^uploads\//)
+  })
+  it('should return validation errors for invalid data', async () => {
+    const res = await request(app)
+      .post('/api/products')
+      .send({ name: '', price: '', image: null })
+
+    expect(res.status).toBe(400)
+    expect(res).toHaveProperty('text', '{\"message\":\"Invalid input\"}')
     })
-    expect(result).toBe(true)
-  })
-
-  it('should delete a product', async () => {
-    const productId = 1
-    Product.destroy.mockResolvedValueOnce(1) // Mocking Sequelize's destroy method, which returns the number of deleted rows
-
-    const result = await deleteProduct(productId)
-    expect(Product.destroy).toHaveBeenCalledWith({
-      where: { id: productId },
-    })
-    expect(result).toBe(true)
-  })
 })

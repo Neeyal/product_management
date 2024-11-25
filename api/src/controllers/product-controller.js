@@ -5,6 +5,7 @@ const { Op } = require('sequelize')
 exports.createProduct = async (req, res) => {
   try {
     const { name, price } = req.body
+    console.log(req.file)
     const image = req.file?.filename
 
     if (!name || !price || !image) {
