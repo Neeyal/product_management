@@ -145,7 +145,7 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
                       style={{ width: 80, height: 80 }}
                     />
                   </td>
-                  <td>${product.price}</td>
+                  <td>{product.price}</td>
                   <td>{new Date(product.createdAt).toLocaleDateString()}</td>
                   <td>
                     <button onClick={() => handleEditClick(product)}>Edit</button>

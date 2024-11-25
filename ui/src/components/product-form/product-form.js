@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import axios from 'axios'
 
 const ProductForm = ({ onProductAdded }) => {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [image, setImage] = useState(null)
+  const fileInputRef = useRef(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -18,6 +19,10 @@ const ProductForm = ({ onProductAdded }) => {
     setName('')
     setPrice('')
     setImage(null)
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -36,7 +41,7 @@ const ProductForm = ({ onProductAdded }) => {
         onChange={(e) => setPrice(e.target.value)}
         required
       />
-      <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} required />
+      <input type="file" ref={fileInputRef} accept="image/*" onChange={(e) => setImage(e.target.files[0])} required />
       <button type="submit">Add Product</button>
     </form>
   )
