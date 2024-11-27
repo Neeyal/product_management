@@ -16,7 +16,7 @@ This project provides a simple API for managing products. It allows users to cre
 - **Express.js** - Web framework for handling API requests.
 - **Sequelize** - ORM for interacting with the PostgreSQL database.
 - **Multer** - Middleware for handling file uploads.
-- **Jest** - Testing framework for unit and integration tests.
+- **Vitest** - Testing framework for unit and integration tests.
 - **Supertest** - HTTP assertion library for testing the API.
 
 ## Prerequisites
