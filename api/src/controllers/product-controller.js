@@ -4,7 +4,6 @@ import { Op } from 'sequelize'
 export const createProduct = async (req, res) => {
   try {
     const { name, price } = req.body
-    console.log(req.file)
     const image = req.file?.filename
 
     if (!name || !price || !image) {
@@ -21,7 +20,6 @@ export const createProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
   try {
     const { search, startDate, endDate, sort } = req.query
-
     const where = {}
 
     if (search) where.name = { [Op.like]: `%${search}%` }
@@ -49,7 +47,6 @@ export const updateProduct = async (req, res) => {
 
     if (!product) return res.status(404).json({ message: 'Product not found' })
 
-    if (req.file) product.imagePath = req.file.path
     if (name) product.name = name
     if (price) product.price = price
 

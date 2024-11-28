@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const ProductList = ({ products, setProducts, onProductUpdated }) => {
+const ProductList = ({ products, onProductUpdated }) => {
   const [editingProduct, setEditingProduct] = useState(null)
   const [editedDetails, setEditedDetails] = useState({})
   const [currentPage, setCurrentPage] = useState(1)
@@ -59,37 +59,10 @@ const ProductList = ({ products, setProducts, onProductUpdated }) => {
     }
   }
 
-  const resetFilters = () => {
-    setNameFilter('')
-    setStartDate('')
-    setEndDate('')
-    setCurrentPage(1)
-  }
 
   return (
     <div className="product-list">
-      {/* Filter Section */}
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-        />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        <button onClick={resetFilters}>Reset Filters</button>
-      </div>
-
-      {/* Product Table */}
+     {/* Product Table */}
       <table>
         <thead>
           <tr>

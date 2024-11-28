@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ProductForm from './components/product-form/product-form.js'
 import ProductList from './components/product-table/product-table.js'
+import FilterForm from './components/product-form/product-filter-form.js'
 import './index.css'
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
     <div className="container">
       <h1>Product Management</h1>
       <ProductForm onProductAdded={fetchProducts} />
+      <FilterForm filters={filters} setFilters={setFilters} />
       <ProductList
         products={products}
         filters={filters}
