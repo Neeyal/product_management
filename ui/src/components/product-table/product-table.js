@@ -1,44 +1,37 @@
 import React, { useState } from 'react'
 
-const ProductList = ({ products, onProductUpdated }) => {
+const ProductList = ({ products, totalPages, filters, setFilters }) => {
   const [editingProduct, setEditingProduct] = useState(null)
   const [editedDetails, setEditedDetails] = useState({})
-  const [currentPage, setCurrentPage] = useState(1)
-  const [nameFilter, setNameFilter] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const itemsPerPage = 5
+  const [editedImage, setEditedImage] = useState(null)
+  const currentPage = filters.page || 1
 
-  const filteredProducts = products.filter((product) => {
-    const matchesName = product.name.toLowerCase().includes(nameFilter.toLowerCase())
-    const matchesDate =
-      (!startDate || new Date(product.createdAt) >= new Date(startDate)) &&
-      (!endDate || new Date(product.createdAt) <= new Date(endDate))
-    return matchesName && matchesDate
-  })
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
-  // Handle editing a product
   const handleEditClick = (product) => {
     setEditingProduct(product)
     setEditedDetails({ ...product })
+    setEditedImage(null)
   }
 
-  // Save edited product
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    setEditedImage(file)
+  }
+
   const handleSaveClick = async () => {
     try {
+      const formData = new FormData()
+      formData.append('name', editedDetails.name)
+      formData.append('price', editedDetails.price)
+      if (editedImage) {
+        formData.append('image', editedImage)
+      }
+
       const response = await fetch(`http://localhost:3001/api/products/${editingProduct.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editedDetails),
+        body: formData,
       })
       if (response.ok) {
-        await onProductUpdated()
+        setFilters({ ...filters })
         setEditingProduct(null)
       } else {
         console.error('Failed to update product')
@@ -50,31 +43,39 @@ const ProductList = ({ products, onProductUpdated }) => {
 
   const handleCancelClick = () => {
     setEditingProduct(null)
-    onProductUpdated()
+    setEditedImage(null)
   }
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage)
+      setFilters({ ...filters, page: newPage })
     }
   }
 
+  const handleSortClick = () => {
+    const newOrder = filters.order === 'asc' ? 'desc' : 'asc'
+    setFilters({ ...filters, order: newOrder, page: 1 })
+  }
 
   return (
     <div className="product-list">
-     {/* Product Table */}
       <table>
         <thead>
           <tr>
             <th>Name</th>
             <th>Image</th>
             <th>Price</th>
-            <th>Creation Date</th>
+            <th>
+              Creation Date
+              <button onClick={handleSortClick}>
+                Sort ({filters.order === 'asc' ? 'Asc' : 'Desc'})
+              </button>
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {paginatedProducts.map((product) => (
+          {products.map((product) => (
             <tr key={product.id}>
               {editingProduct?.id === product.id ? (
                 <>
@@ -88,11 +89,20 @@ const ProductList = ({ products, onProductUpdated }) => {
                     />
                   </td>
                   <td>
-                    <img
-                      src={`http://localhost:3001/${product.imagePath}`}
-                      alt={product.name}
-                      style={{ width: 50, height: 50 }}
-                    />
+                    <input type="file" onChange={handleImageChange} />
+                    {editedImage ? (
+                      <img
+                        src={URL.createObjectURL(editedImage)}
+                        alt="Preview"
+                        style={{ width: 50, height: 50 }}
+                      />
+                    ) : (
+                      <img
+                        src={`http://localhost:3001/${product.imagePath}`}
+                        alt={product.name}
+                        style={{ width: 50, height: 50 }}
+                      />
+                    )}
                   </td>
                   <td>
                     <input
@@ -130,7 +140,6 @@ const ProductList = ({ products, onProductUpdated }) => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
       <div className="pagination">
         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
           Previous

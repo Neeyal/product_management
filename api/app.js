@@ -1,6 +1,5 @@
 import express from 'express'
 import productRoutes from './src/routes/product-routes.js'
-import sequelize from './database.js'
 import cors from 'cors'
 import path from 'path'
 
