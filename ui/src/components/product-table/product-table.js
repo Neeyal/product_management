@@ -89,7 +89,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                     />
                   </td>
                   <td>
-                    <input type="file" onChange={handleImageChange} />
+                    <input type="file" accept='Image/*' onChange={handleImageChange} />
                     {editedImage ? (
                       <img
                         src={URL.createObjectURL(editedImage)}
@@ -107,6 +107,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                   <td>
                     <input
                       type="number"
+                      min='1'
                       value={editedDetails.price}
                       onChange={(e) =>
                         setEditedDetails({ ...editedDetails, price: +e.target.value })

@@ -37,6 +37,7 @@ const ProductForm = ({ onProductAdded }) => {
       <input
         type="number"
         placeholder="Price"
+        min='1'
         value={price}
         onChange={(e) => setPrice(e.target.value)}
         required
