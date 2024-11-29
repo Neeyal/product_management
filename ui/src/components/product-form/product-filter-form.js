@@ -6,6 +6,12 @@ const FilterForm = ({ filters, setFilters }) => {
   const [errors, setErrors] = useState({ search: '', startDate: '', endDate: '' })
   const [debouncedSearch, setDebouncedSearch] = useState(localFilters.search)
 
+  const isResetDisabled = !(
+    localFilters.search ||
+    localFilters.startDate ||
+    localFilters.endDate
+  )
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setLocalFilters((prevFilters) => ({
@@ -23,7 +29,13 @@ const FilterForm = ({ filters, setFilters }) => {
   }, [localFilters])
 
   const resetFilters = () => {
-    const resetValues = { search: '', startDate: '', endDate: '' }
+    const resetValues = {
+      ...filters,
+      search: '',
+      startDate: '',
+      endDate: '',
+      page: 1
+    }
     setLocalFilters(resetValues)
     setErrors({ search: '', startDate: '', endDate: '' })
     setFilters(resetValues)
@@ -88,7 +100,9 @@ const FilterForm = ({ filters, setFilters }) => {
           {errors[key] && <div className="error">{errors[key]}</div>}
         </div>
       ))}
-      <button onClick={resetFilters}>Reset Filters</button>
+      <button onClick={resetFilters} disabled={isResetDisabled}>
+        Reset Filters
+      </button>
     </div>
   )
 }

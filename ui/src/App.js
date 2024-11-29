@@ -7,7 +7,7 @@ import './index.css'
 const App = () => {
   const [products, setProducts] = useState([])
   const [totalPages, setTotalPages] = useState(0)
-  const [filters, setFilters] = useState({ search: '', startDate: '', endDate: '', sort: 'asc', page: 1 })
+  const [filters, setFilters] = useState({ search: '', startDate: '', endDate: '', order: 'asc', page: 1 })
 
   const fetchProducts = async () => {
     const query = new URLSearchParams(filters).toString()

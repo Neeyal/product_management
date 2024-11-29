@@ -28,7 +28,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
 
       const response = await fetch(`http://localhost:3001/api/products/${editingProduct.id}`, {
         method: 'PUT',
-        body: formData,
+        body: formData
       })
       if (response.ok) {
         setFilters({ ...filters })
@@ -68,14 +68,14 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
             <th>
               Creation Date
               <button onClick={handleSortClick}>
-                Sort ({filters.order === 'asc' ? 'Asc' : 'Desc'})
+                Sort ({filters.order === 'asc' ? 'Desc' : 'Asc'})
               </button>
             </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          { products.map((product) => (
             <tr key={product.id}>
               {editingProduct?.id === product.id ? (
                 <>
@@ -89,7 +89,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                     />
                   </td>
                   <td>
-                    <input type="file" accept='Image/*' onChange={handleImageChange} />
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
                     {editedImage ? (
                       <img
                         src={URL.createObjectURL(editedImage)}
@@ -107,7 +107,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                   <td>
                     <input
                       type="number"
-                      min='1'
+                      min="1"
                       value={editedDetails.price}
                       onChange={(e) =>
                         setEditedDetails({ ...editedDetails, price: +e.target.value })
