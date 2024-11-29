@@ -22,7 +22,12 @@ h1 {
 .product-form {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin: 20px auto;
+  padding: 15px 15px 15px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
 
 .product-form input,
@@ -67,12 +72,6 @@ h1 {
   border-radius: 4px;
 }
 
-.filters {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
 .pagination {
   display: flex;
   justify-content: center;
@@ -99,8 +98,62 @@ h1 {
   font-size: 14px;
   color: #555;
 }
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: 4px;
+.filters {
+  display: flex;
+  gap: 10px;
+  margin: 20px auto;
+  padding: 15px 15px 0px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.filters div {
+  margin-bottom: 15px;
+}
+
+.filters input[type="text"],
+.filters input[type="date"] {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.filters input[type="text"]:focus,
+.filters input[type="date"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.filters .error {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.filters button {
+  height: 38px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filters button:hover {
+  background-color: #0056b3;
+}
+
+.filters button:active {
+  background-color: #003f7f;
+}
+
+.filters button:focus {
+  outline: none;
 }

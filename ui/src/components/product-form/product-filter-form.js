@@ -3,11 +3,7 @@ import { isBefore, parseISO, isValid } from 'date-fns'
 
 const FilterForm = ({ filters, setFilters }) => {
   const [localFilters, setLocalFilters] = useState(filters)
-  const [errors, setErrors] = useState({
-    search: '',
-    startDate: '',
-    endDate: ''
-  })
+  const [errors, setErrors] = useState({ search: '', startDate: '', endDate: '' })
   const [debouncedSearch, setDebouncedSearch] = useState(localFilters.search)
 
   useEffect(() => {
@@ -17,22 +13,17 @@ const FilterForm = ({ filters, setFilters }) => {
         search: debouncedSearch
       }))
     }, 300)
-
     return () => clearTimeout(timeout)
   }, [debouncedSearch])
 
   useEffect(() => {
-    if (validateInputs('startDate', localFilters.startDate) && validateInputs('endDate', localFilters.endDate)) {
+    if (validateDates()) {
       setFilters(localFilters)
     }
   }, [localFilters])
 
   const resetFilters = () => {
-    const resetValues = {
-      search: '',
-      startDate: '',
-      endDate: ''
-    }
+    const resetValues = { search: '', startDate: '', endDate: '' }
     setLocalFilters(resetValues)
     setErrors({ search: '', startDate: '', endDate: '' })
     setFilters(resetValues)
@@ -40,83 +31,64 @@ const FilterForm = ({ filters, setFilters }) => {
 
   const handleInputChange = (key, value) => {
     if (key === 'search') {
-      setDebouncedSearch(value) 
+      setDebouncedSearch(value)
     } else {
-      setLocalFilters({
-        ...localFilters,
-        [key]: value
-      })
+      setLocalFilters({ ...localFilters, [key]: value })
+      validateDates()
     }
-    validateInputs(key, value)
   }
 
-  const validateInputs = (key, value) => {
+  const validateDates = () => {
     const newErrors = { ...errors }
     let isValidInput = true
 
-    if (key === 'startDate') {
-      if (value && !isValid(parseISO(value))) {
-        newErrors.startDate = 'Start date is invalid.'
-        isValidInput = false
-      } else {
-        newErrors.startDate = ''
-        if (localFilters.endDate && isBefore(parseISO(localFilters.endDate), parseISO(value))) {
-          newErrors.startDate = 'Start date cannot be after end date.'
-          isValidInput = false
-        }
-      }
+    const start = parseISO(localFilters.startDate)
+    const end = parseISO(localFilters.endDate)
+
+    if (localFilters.startDate && !isValid(start)) {
+      newErrors.startDate = 'Start date is invalid.'
+      isValidInput = false
+    } else {
+      newErrors.startDate = ''
     }
 
-    if (key === 'endDate') {
-      if (value && !isValid(parseISO(value))) {
-        newErrors.endDate = 'End date is invalid.'
-        isValidInput = false
-      } else {
-        newErrors.endDate = ''
-        if (localFilters.startDate && isBefore(parseISO(value), parseISO(localFilters.startDate))) {
-          newErrors.endDate = 'End date cannot be before start date.'
-          isValidInput = false
-        }
-      }
+    if (localFilters.endDate && !isValid(end)) {
+      newErrors.endDate = 'End date is invalid.'
+      isValidInput = false
+    } else {
+      newErrors.endDate = ''
+    }
+
+    if (isValid(start) && isValid(end) && isBefore(end, start)) {
+      newErrors.startDate = 'Start date cannot be after end date.'
+      newErrors.endDate = 'End date cannot be before start date.'
+      isValidInput = false
     }
 
     setErrors(newErrors)
     return isValidInput
   }
 
+  const fields = [
+    { key: 'search', type: 'text', placeholder: 'Search by name' },
+    { key: 'startDate', type: 'date' },
+    { key: 'endDate', type: 'date' }
+  ]
+
   return (
     <div className="filters">
-      <div>
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={debouncedSearch}
-          onChange={(e) => handleInputChange('search', e.target.value)}
-        />
-        {errors.search && <div className="error">{errors.search}</div>}
-      </div>
-
-      <div>
-        <input
-          type="date"
-          value={localFilters.startDate}
-          onChange={(e) => handleInputChange('startDate', e.target.value)}
-        />
-        {errors.startDate && <div className="error">{errors.startDate}</div>}
-      </div>
-
-      <div>
-        <input
-          type="date"
-          value={localFilters.endDate}
-          onChange={(e) => handleInputChange('endDate', e.target.value)}
-        />
-        {errors.endDate && <div className="error">{errors.endDate}</div>}
-      </div>
-
-      <div>
-        <button onClick={resetFilters}>Reset Filters</button>
-      </div>
+      {fields.map(({ key, type, placeholder }) => (
+        <div key={key}>
+          <input
+            type={type}
+            placeholder={placeholder}
+            value={localFilters[key] || ''}
+            onChange={(e) => handleInputChange(key, e.target.value)}
+          />
+          {errors[key] && <div className="error">{errors[key]}</div>}
+        </div>
+      ))}
+      <button onClick={resetFilters}>Reset Filters</button>
     </div>
   )
 }
