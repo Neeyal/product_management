@@ -31,7 +31,6 @@ const App = () => {
         totalPages={totalPages}
         filters={filters}
         setFilters={setFilters}
-        onProductUpdated={fetchProducts}
       />
     </div>
   )
