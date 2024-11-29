@@ -125,18 +125,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                         />
                         <button
                           onClick={() => handleRemoveImage(image)}
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            right: 0,
-                            background: 'red',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '50%',
-                            cursor: 'pointer',
-                            width: '20px',
-                            height: '20px',
-                          }}
+                          class='removeButton'
                         >
                           ×
                         </button>

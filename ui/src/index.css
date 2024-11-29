@@ -157,3 +157,16 @@ h1 {
 .filters button:focus {
   outline: none;
 }
+
+.removeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
