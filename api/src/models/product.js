@@ -10,7 +10,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
-  imagePath: {
+  imagePaths: {
     type: DataTypes.TEXT,
     allowNull: false,
   },

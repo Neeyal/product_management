@@ -5,13 +5,20 @@ import { startOfDay, endOfDay, parseISO, isBefore } from 'date-fns'
 export const createProduct = async (req, res) => {
   try {
     const { name, price } = req.body
-    const image = req.file?.filename
+    const images = req.files
 
-    if (!name || !price || !image) {
-      return res.status(400).json({ message: 'Invalid input' })
+    if (!name || !price || images.length === 0) {
+      return res.status(400).json({ message: 'Invalid input: Name, price, and at least one image are required.' })
     }
 
-    const product = await Product.create({ name, price, imagePath: `uploads/${image}` })
+    const imagePaths = images.map(image => `uploads/${image.filename}`).join(',')
+
+    const product = await Product.create({
+      name,
+      price,
+      imagePaths,
+    })
+
     res.status(201).json(product)
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -58,7 +65,12 @@ export const getProducts = async (req, res) => {
       offset,
     })
 
-    res.json({ products, total, totalPages: Math.ceil(total / limit) })
+    const productsWithImages = products.map((product) => ({
+      ...product.toJSON(),
+      imagePaths: product.imagePaths ? product.imagePaths.split(',') : [],
+    }))
+
+    res.json({ products: productsWithImages, total, totalPages: Math.ceil(total / limit) })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -67,7 +79,8 @@ export const getProducts = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params
-    const { name, price } = req.body
+    const { name, price, removeImages } = req.body
+    const images = req.files
 
     const product = await Product.findByPk(id)
 
@@ -75,16 +88,29 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' })
     }
 
-    if (req.file) {
-      product.imagePath = req.file.path
+    let updatedImagePaths = product.imagePaths ? product.imagePaths.split(',') : []
+
+    let parsedRemoveImages = []
+
+    if (removeImages) {
+        parsedRemoveImages = JSON.parse(removeImages)
     }
+
+    parsedRemoveImages = parsedRemoveImages.map(image => image.replace(/['"]/g, '').trim())
+    updatedImagePaths = updatedImagePaths.filter(path => !parsedRemoveImages.includes(path))
+
+    if (images && images.length > 0) {
+      const newImagePaths = images.map(image => `uploads/${image.filename}`)
+      updatedImagePaths = [...updatedImagePaths, ...newImagePaths]
+    }
+
     if (name) {
       product.name = name
     }
     if (price) {
       product.price = price
     }
-
+    product.imagePaths = updatedImagePaths.join(',')
     await product.save()
     res.json(product)
   } catch (err) {

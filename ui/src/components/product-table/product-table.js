@@ -3,36 +3,60 @@ import React, { useState } from 'react'
 const ProductList = ({ products, totalPages, filters, setFilters }) => {
   const [editingProduct, setEditingProduct] = useState(null)
   const [editedDetails, setEditedDetails] = useState({})
-  const [editedImage, setEditedImage] = useState(null)
+  const [editedImages, setEditedImages] = useState([])
+  const [removedImages, setRemovedImages] = useState([])
+  const [imageError, setImageError] = useState('')
   const currentPage = filters.page || 1
 
   const handleEditClick = (product) => {
     setEditingProduct(product)
     setEditedDetails({ ...product })
-    setEditedImage(null)
+    setEditedImages([])
+    setRemovedImages([])
+    setImageError('')
   }
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    setEditedImage(file)
+    setEditedImages(Array.from(e.target.files))
+    setImageError('')
+  }
+
+  const handleRemoveImage = (imagePath) => {
+    setRemovedImages([...removedImages, imagePath])
+    setEditedDetails({
+      ...editedDetails,
+      imagePaths: editedDetails.imagePaths.filter(path => path !== imagePath),
+    })
   }
 
   const handleSaveClick = async () => {
+    const hasImages = editedDetails.imagePaths.length > 0 || editedImages.length > 0
+
+    if (!hasImages) {
+      setImageError('At least one image is required.')
+      return
+    }
+
     try {
       const formData = new FormData()
       formData.append('name', editedDetails.name)
       formData.append('price', editedDetails.price)
-      if (editedImage) {
-        formData.append('image', editedImage)
+
+      for (let i = 0; i < editedImages.length; i++) {
+        formData.append('images', editedImages[i])
       }
+
+      formData.append('removeImages', JSON.stringify(removedImages))
 
       const response = await fetch(`http://localhost:3001/api/products/${editingProduct.id}`, {
         method: 'PUT',
-        body: formData
+        body: formData,
       })
+
       if (response.ok) {
         setFilters({ ...filters })
         setEditingProduct(null)
+        setImageError('')
       } else {
         console.error('Failed to update product')
       }
@@ -43,7 +67,9 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
 
   const handleCancelClick = () => {
     setEditingProduct(null)
-    setEditedImage(null)
+    setEditedImages([])
+    setRemovedImages([])
+    setImageError('')
   }
 
   const handlePageChange = (newPage) => {
@@ -63,7 +89,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Image</th>
+            <th>Images</th>
             <th>Price</th>
             <th>
               Creation Date
@@ -75,7 +101,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
           </tr>
         </thead>
         <tbody>
-          { products.map((product) => (
+          {products.map((product) => (
             <tr key={product.id}>
               {editingProduct?.id === product.id ? (
                 <>
@@ -89,20 +115,42 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                     />
                   </td>
                   <td>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {editedImage ? (
+                    <input type="file" accept="image/*" multiple onChange={handleImageChange} />
+                    {editedDetails.imagePaths.map((image, index) => (
+                      <div key={index} style={{ position: 'relative', display: 'inline-block', margin: '5px' }}>
+                        <img
+                          src={`http://localhost:3001/${image}`}
+                          alt={`Product Image ${index + 1}`}
+                          style={{ width: 50, height: 50 }}
+                        />
+                        <button
+                          onClick={() => handleRemoveImage(image)}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            background: 'red',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            width: '20px',
+                            height: '20px',
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    {editedImages.map((image, index) => (
                       <img
-                        src={URL.createObjectURL(editedImage)}
-                        alt="Preview"
-                        style={{ width: 50, height: 50 }}
+                        key={index}
+                        src={URL.createObjectURL(image)}
+                        alt="New Preview"
+                        style={{ width: 50, height: 50, margin: '5px' }}
                       />
-                    ) : (
-                      <img
-                        src={`http://localhost:3001/${product.imagePath}`}
-                        alt={product.name}
-                        style={{ width: 50, height: 50 }}
-                      />
-                    )}
+                    ))}
+                    {imageError && <div style={{ color: 'red', marginTop: '5px' }}>{imageError}</div>}
                   </td>
                   <td>
                     <input
@@ -123,11 +171,14 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                 <>
                   <td>{product.name}</td>
                   <td>
-                    <img
-                      src={`http://localhost:3001/${product.imagePath}`}
-                      alt={product.name}
-                      style={{ width: 80, height: 80 }}
-                    />
+                    {product.imagePaths.map((image, index) => (
+                      <img
+                        key={index}
+                        src={`http://localhost:3001/${image}`}
+                        alt={`Product Image ${index + 1}`}
+                        style={{ width: 50, height: 50, margin: '5px' }}
+                      />
+                    ))}
                   </td>
                   <td>{product.price}</td>
                   <td>{new Date(product.createdAt).toLocaleDateString()}</td>

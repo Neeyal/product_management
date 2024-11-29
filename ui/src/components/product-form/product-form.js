@@ -4,7 +4,7 @@ import axios from 'axios'
 const ProductForm = ({ onProductAdded }) => {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
-  const [image, setImage] = useState(null)
+  const [images, setImages] = useState([])
   const fileInputRef = useRef(null)
 
   const handleSubmit = async (e) => {
@@ -12,17 +12,23 @@ const ProductForm = ({ onProductAdded }) => {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('price', price)
-    formData.append('image', image)
+    for (let i = 0; i < images.length; i++) {
+      formData.append('images', images[i])
+    }
 
     await axios.post('http://localhost:3001/api/products', formData)
     onProductAdded()
     setName('')
     setPrice('')
-    setImage(null)
+    setImages([])
 
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
+  }
+
+  const handleImageChange = (e) => {
+    setImages(Array.from(e.target.files))
   }
 
   return (
@@ -37,12 +43,19 @@ const ProductForm = ({ onProductAdded }) => {
       <input
         type="number"
         placeholder="Price"
-        min='1'
+        min="1"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
         required
       />
-      <input type="file" ref={fileInputRef} accept="image/*" onChange={(e) => setImage(e.target.files[0])} required />
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        multiple
+        onChange={handleImageChange}
+        required
+      />
       <button type="submit">Add Product</button>
     </form>
   )

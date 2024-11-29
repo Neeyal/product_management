@@ -6,8 +6,8 @@ const router = express.Router()
 
 const upload = multer({ dest: 'uploads/' })
 
-router.post('/products', upload.single('image'), createProduct)
+router.post('/products', upload.array('images', 10), createProduct)
 router.get('/products', getProducts)
-router.put('/products/:id', upload.single('image'), updateProduct)
+router.put('/products/:id', upload.array('images', 10), updateProduct)
 
 export default router

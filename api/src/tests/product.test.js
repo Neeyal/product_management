@@ -19,7 +19,7 @@ describe('Product API Tests', () => {
     await Product.create({
       name: 'Sample Product',
       price: 19.99,
-      imagePath: 'uploads/sample-product.jpg',
+      imagePaths: 'uploads/sample-product.jpg',
     })
 
     const res = await request(app).get('/api/products')
@@ -31,25 +31,24 @@ describe('Product API Tests', () => {
   })
 
   it('should create a product', async () => {
-    const imagePath = path.join(__dirname, './fixtures/test-image.jpg')
+    const imagePaths = path.join(__dirname, './fixtures/test-image.jpg')
 
-    // Ensure the file exists
-    if (!fs.existsSync(imagePath)) {
-      throw new Error('Test image file not found at path: ' + imagePath)
+    if (!fs.existsSync(imagePaths)) {
+      throw new Error('Test image file not found at path: ' + imagePaths)
     }
 
     const res = await request(app)
       .post('/api/products')
       .field('name', 'Test Product')
       .field('price', '10.99')
-      .attach('image', imagePath)
+      .attach('images', imagePaths)
 
     expect(res.status).toBe(201)
     expect(res.body).toHaveProperty('id')
     expect(res.body).toHaveProperty('name', 'Test Product')
     expect(res.body).toHaveProperty('price', '10.99')
-    expect(res.body).toHaveProperty('imagePath')
-    expect(res.body.imagePath).toMatch(/^uploads\//)
+    expect(res.body).toHaveProperty('imagePaths')
+    expect(res.body.imagePaths).toMatch(/^uploads\//)
   })
 
   it('should return validation errors for invalid data', async () => {
@@ -58,6 +57,6 @@ describe('Product API Tests', () => {
       .send({ name: '', price: '', image: null })
 
     expect(res.status).toBe(400)
-    expect(res.body).toHaveProperty('message', 'Invalid input') 
+    expect(res.body).toHaveProperty('message', 'Invalid input: Name, price, and at least one image are required.') 
   })
 })
