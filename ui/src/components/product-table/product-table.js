@@ -15,6 +15,17 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
     setRemovedImages([])
     setImageError('')
   }
+  const handleDeleteClick = async(productId) => {
+    try{
+      const response = await fetch(`http://localhost:3001/api/products/${productId}`,{ method:'DELETE' })
+    if(response.ok){
+      setFilters({...filters})
+    }
+    }
+    catch(error){
+      console.log("unable to delete product")
+    }
+  }
 
   const handleImageChange = (e) => {
     setEditedImages(Array.from(e.target.files))
@@ -125,7 +136,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                         />
                         <button
                           onClick={() => handleRemoveImage(image)}
-                          class='removeButton'
+                          className='removeButton'
                         >
                           ×
                         </button>
@@ -173,6 +184,7 @@ const ProductList = ({ products, totalPages, filters, setFilters }) => {
                   <td>{new Date(product.createdAt).toLocaleDateString()}</td>
                   <td>
                     <button onClick={() => handleEditClick(product)}>Edit</button>
+                    <button onClick={() => handleDeleteClick(product.id)}>Delete</button>
                   </td>
                 </>
               )}

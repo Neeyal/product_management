@@ -117,3 +117,21 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 }
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const product = await Product.findByPk(id)
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' })
+    }
+
+    await product.destroy()
+    res.json({message: 'Product deleted successfully'})
+  }
+  catch(err){
+
+  }
+}
